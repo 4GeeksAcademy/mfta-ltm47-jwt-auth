@@ -1,52 +1,44 @@
 import React, { useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 export const Home = () => {
-
 	const { store, dispatch } = useGlobalReducer()
 
-	const loadMessage = async () => {
-		try {
-			const backendUrl = import.meta.env.VITE_BACKEND_URL
+	useEffect(() => {
+		const apiUrl = import.meta.env.VITE_BACKEND_URL;
 
-			if (!backendUrl) throw new Error("VITE_BACKEND_URL is not defined in .env file")
+		async function fetchUser() {
+			try {
+				const token = localStorage.getItem("token");
+				if (!token) {
+					console.log("No token found, user is not logged in.");
+					return;
+				}
 
-			const response = await fetch(backendUrl + "/api/hello")
-			const data = await response.json()
+				const response = await fetch(`${apiUrl}/user`, {
+					headers: {
+						Authorization: `Bearer ${token}`
+					}
+				});
 
-			if (response.ok) dispatch({ type: "set_hello", payload: data.message })
+				if (!response.ok) {
+					console.error('Failed to fetch user data');
+					throw new Error('Failed to fetch user data');
+				}
 
-			return data
-
-		} catch (error) {
-			if (error.message) throw new Error(
-				`Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-			);
+				const userData = await response.json();
+				dispatch({ type: 'set_user', payload: userData });
+			} catch (error) {
+				console.error(error);
+			}
 		}
 
-	}
-
-	useEffect(() => {
-		loadMessage()
-	}, [])
+		fetchUser();
+	}, [dispatch]);
 
 	return (
 		<div className="text-center mt-5">
-			<h1 className="display-4">Hello Rigo!!</h1>
-			<p className="lead">
-				<img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-			</p>
-			<div className="alert alert-info">
-				{store.message ? (
-					<span>{store.message}</span>
-				) : (
-					<span className="text-danger">
-						Loading message from the backend (make sure your python 🐍 backend is running)...
-					</span>
-				)}
-			</div>
+			<h1>Welcome to the Home Page, {store?.user?.email || "Guest"}</h1>
 		</div>
 	);
 }; 

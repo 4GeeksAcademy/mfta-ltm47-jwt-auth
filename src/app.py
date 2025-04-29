@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity
+from flask_cors import CORS
 
 from api.utils import APIException, generate_sitemap
 from api.models import db, User
@@ -20,6 +21,7 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
+CORS(app)
 bcrypt = Bcrypt(app)
 app.url_map.strict_slashes = False
 
@@ -131,6 +133,16 @@ def protected():
     return jsonify({"message": "This is a protected route", "user_id": current_user_id}), 200
 
 
+@app.route("/user", methods=["GET"])
+@jwt_required()
+def get_user():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    
+    return jsonify(user.serialize()), 200
 
 
 
