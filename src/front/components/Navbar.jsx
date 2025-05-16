@@ -12,7 +12,7 @@ export const Navbar = () => {
 
 
 	return (
-		<nav className="navbar navbar-light bg-light">
+		<nav className="navbar navbar-light bg-neutral-100 w-100">
 			<div className="container">
 				<Link to="/">
 					<span className="navbar-brand mb-0 h1">JWT Basic Auth</span>
@@ -20,9 +20,9 @@ export const Navbar = () => {
 				{/* If the user is logged ... */}
 				{
 					store?.user && 
-					<div className="ml-auto">
-						<span className="navbar-text me-2">Welcome, {store.user.email}</span>
-							<button className="btn btn-danger" onClick={handleLogout} >Logout</button>
+					<div className="ml-auto d-flex gap-2 align-items-center">
+						<Link to="/private">Private Page</Link>
+						<button className="btn btn-danger" onClick={handleLogout} >Logout</button>
 					</div>
 				}
 
