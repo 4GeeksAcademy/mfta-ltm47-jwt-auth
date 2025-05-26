@@ -5,7 +5,7 @@ import privateImage from '../assets/img/private.jpg'
 
 const Private = () => {
   const navigate = useNavigate()
-  const { store, dispatch } = useGlobalReducer()
+  const { store} = useGlobalReducer()
   const { user } = store
   
   useEffect(() => {

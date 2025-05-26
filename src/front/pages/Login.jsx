@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import useGlobalReducer from '../hooks/useGlobalReducer';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const {store, dispatch} = useGlobalReducer();
 
   const apiUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -24,8 +26,7 @@ const Login = () => {
         throw new Error('Login failed');
       }
       const data = await response.json();
-      // Save the token to localStorage
-      localStorage.setItem("token", data.token);
+      dispatch({type: "login", payload: {token: data.token, user: data.user}})
       // Redirect to the home page
       navigate('/');
     } catch (error) {

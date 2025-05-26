@@ -6,18 +6,16 @@ import { useNavigate } from "react-router-dom";
 export const Home = () => {
 	const navigate = useNavigate()
 	const { store, dispatch } = useGlobalReducer()
+	const { user, token} = store
 
 	useEffect(() => {
+		if (user && token) return;
+		
 		const apiUrl = import.meta.env.VITE_BACKEND_URL;
 
 		async function fetchUser() {
 			try {
-				const token = localStorage.getItem("token");
-				
-				if (!token) {
-					console.log("No token found, user is not logged in.");
-					return;
-				}
+				if (!token) return;
 
 				const response = await fetch(`${apiUrl}/user`, {
 					headers: {
@@ -27,19 +25,20 @@ export const Home = () => {
 
 				if (!response.ok) {
 					console.error('Failed to fetch user data');
-					localStorage.removeItem("token");
+					dispatch({type: "logout"})
 					return;
 				}
 
 				const userData = await response.json();
-				dispatch({ type: 'set_user', payload: userData });
+				dispatch({ type: 'login', payload: {user: userData, token}});
 			} catch (error) {
 				console.error(error);
+				dispatch({type: "logout"})
 			}
 		}
 
 		fetchUser();
-	}, [dispatch]);
+	}, [dispatch, user, token]);
 
 	return (
 		<div className="d-flex flex-column align-items-center w-100 p-4">

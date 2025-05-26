@@ -6,8 +6,7 @@ export const Navbar = () => {
 	const {store, dispatch} = useGlobalReducer();
 
 	function handleLogout() {
-		localStorage.removeItem("token");
-		dispatch({ type: 'set_user', payload: null });
+		dispatch({type: "logout"})
 	}
 
 
